@@ -3,19 +3,26 @@ import FileNode from "../node/FileNode";
 
 export default class FileVisitor extends TreeVisitor {
 
-  postVisitInternal(node: FileNode) {
-    console.log(node);
-  }
+  readonly files: string[] = [];
 
   preVisitInternal(node: FileNode) {
-    console.log(node);
+    console.log("pre: " + node.fPath);
+  }
+
+  postVisitInternal(node: FileNode) {
+    console.log("post: " + node.fPath);
   }
 
   visitExternal(node: FileNode) {
-    console.log(node);
+    this.files.push(node.fPath);
+    console.log("file: " + node.fPath);
+  }
+
+  visitLimitDepth(node: FileNode) {
+    console.log("limit: " + node.fPath);
   }
 
   visitFailure(node: FileNode) {
-    console.log(node);
+    console.log("failure: " + node.fPath);
   }
 }

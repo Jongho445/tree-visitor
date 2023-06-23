@@ -5,7 +5,10 @@ import fs from "fs/promises";
 
 export default class FileNode extends TreeNode {
 
-  constructor(readonly fPath: string, readonly type: NodeType) {
+  constructor(
+    readonly fPath: string,
+    readonly type: NodeType
+  ) {
     super(type);
   }
 
