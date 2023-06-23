@@ -4,10 +4,15 @@ import {NodeType} from "./NodeType";
 export default class ObjectNode extends TreeNode {
 
   constructor(
+    readonly parent: ObjectNode | null,
     readonly obj: object,
     readonly type: NodeType
   ) {
-    super(type);
+    super(parent, type);
+  }
+
+  static root(obj: object): ObjectNode {
+    return new ObjectNode(null, obj, NodeType.INTERNAL);
   }
 
   getChildren(): Promise<TreeNode[]> {
@@ -16,7 +21,7 @@ export default class ObjectNode extends TreeNode {
       const child = this.obj[key];
       const type = typeof child === "object" ? NodeType.INTERNAL : NodeType.EXTERNAL;
 
-      return new ObjectNode(this.obj[key], type)
+      return new ObjectNode(this, this.obj[key], type)
     });
 
     return Promise.resolve(children);

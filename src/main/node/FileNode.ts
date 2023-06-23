@@ -6,10 +6,15 @@ import fs from "fs/promises";
 export default class FileNode extends TreeNode {
 
   constructor(
+    readonly parent: FileNode | null,
     readonly fPath: string,
     readonly type: NodeType
   ) {
-    super(type);
+    super(parent, type);
+  }
+
+  static root(fPath: string): FileNode {
+    return new FileNode(null, fPath, NodeType.INTERNAL);
   }
 
   async getChildren(): Promise<TreeNode[]> {
@@ -29,7 +34,7 @@ export default class FileNode extends TreeNode {
 
     return fInfos.map(info => {
       const type = info.stat.isDirectory() ? NodeType.INTERNAL : NodeType.EXTERNAL;
-      return new FileNode(info.path, type);
+      return new FileNode(this, info.path, type);
     });
   }
 }

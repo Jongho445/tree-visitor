@@ -1,28 +1,43 @@
 import TreeVisitor from "./TreeVisitor";
 import FileNode from "../node/FileNode";
+import {VisitResult} from "./VisitResult";
+import VisitContext from "./VisitContext";
 
 export default class FileVisitor extends TreeVisitor {
 
   readonly files: string[] = [];
 
-  preVisitInternal(node: FileNode) {
-    console.log("pre: " + node.fPath);
+  constructor(readonly depthLimit: number) {
+    super();
   }
 
-  postVisitInternal(node: FileNode) {
-    console.log("post: " + node.fPath);
+  preVisitInternal(context: VisitContext<FileNode>): VisitResult {
+    console.log("post: " + context.node.fPath);
+
+    if (context.depth === this.depthLimit) {
+      return VisitResult.SKIP_SUBTREE;
+    } else {
+      return VisitResult.CONTINUE;
+    }
   }
 
-  visitExternal(node: FileNode) {
-    this.files.push(node.fPath);
-    console.log("file: " + node.fPath);
+  postVisitInternal(context: VisitContext<FileNode>): VisitResult {
+    console.log("pre: " + context.node.fPath);
+    return VisitResult.CONTINUE;
   }
 
-  visitLimitDepth(node: FileNode) {
-    console.log("limit: " + node.fPath);
+  visitExternal(context: VisitContext<FileNode>): VisitResult {
+    this.files.push(context.node.fPath);
+    console.log("file: " + context.node.fPath);
+    return VisitResult.CONTINUE;
   }
 
-  visitFailure(node: FileNode) {
-    console.log("failure: " + node.fPath);
+  visitFailure(context: VisitContext<FileNode>): VisitResult {
+    console.log("failure: " + context.node.fPath);
+    return VisitResult.CONTINUE;
+  }
+
+  visitLimitDepth(context: VisitContext<FileNode>): VisitResult {
+    return VisitResult.CONTINUE;
   }
 }

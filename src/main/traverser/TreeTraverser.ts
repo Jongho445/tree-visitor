@@ -1,29 +1,47 @@
 import TreeVisitor from "../visitor/TreeVisitor";
 import TreeNode from "../node/TreeNode";
 import {NodeType} from "../node/NodeType";
+import VisitContext from "../visitor/VisitContext";
+import {VisitResult} from "../visitor/VisitResult";
 
 export default class TreeTraverser {
 
-  async traverse(visitor: TreeVisitor, root: TreeNode, depthLimit: number) {
-    await this.traverseRecur(visitor, root, -1, depthLimit)
+  async traverse(visitor: TreeVisitor, root: TreeNode): Promise<void> {
+    await this.traverseRecur(visitor, root, -1)
   }
 
-  private async traverseRecur(visitor: TreeVisitor, node: TreeNode, depth: number, depthLimit: number) {
+  private async traverseRecur(visitor: TreeVisitor, node: TreeNode, depth: number): Promise<VisitResult> {
+    const context = new VisitContext(node, depth);
+
     if (node.type === NodeType.EXTERNAL) {
-      return visitor.visitExternal(node);
+      return visitor.visitExternal(context);
     }
 
-    if (depth === depthLimit) {
-      return visitor.visitLimitDepth(node);
+    const preResult = visitor.preVisitInternal(context);
+    switch (preResult) {
+      case VisitResult.SKIP_SUBTREE:
+      case VisitResult.TERMINATE:
+        return preResult;
     }
-
-    visitor.preVisitInternal(node);
 
     const children = await node.getChildren();
     for (const child of children) {
-      await this.traverseRecur(visitor, child, depth + 1, depthLimit);
+      const recurResult = await this.traverseRecur(visitor, child, depth + 1);
+      let br = false
+      switch (recurResult) {
+        case VisitResult.SKIP_SIBLINGS:
+          br = true;
+          break;
+        case VisitResult.TERMINATE: return recurResult;
+      }
+      if (br) break;
     }
 
-    visitor.postVisitInternal(node);
+    const postResult = visitor.postVisitInternal(context);
+    switch (postResult) {
+      case VisitResult.SKIP_SUBTREE:
+      case VisitResult.TERMINATE:
+        return postResult;
+    }
   }
 }

@@ -1,6 +1,5 @@
 import {it} from "@jest/globals";
 import ObjectNode from "../../main/node/ObjectNode";
-import {NodeType} from "../../main/node/NodeType";
 
 it("test", async () => {
   const obj = {
@@ -12,7 +11,7 @@ it("test", async () => {
     d1c: "d1c-c"
   }
 
-  const node = new ObjectNode(obj, NodeType.INTERNAL);
-  const children = await node.getChildren();
+  const root = ObjectNode.root(obj);
+  const children = await root.getChildren();
   console.log(children);
 });
