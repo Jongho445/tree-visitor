@@ -12,7 +12,7 @@ it("test", async () => {
   const visitor = new FileVisitor(1);
   const root = FileNode.root(tDir);
 
-  // await traverser.traverse(visitor, root);
-  await traverser.traverse(visitor, root);
+  const result = await traverser.traverse(visitor, root);
   console.log(visitor.files);
+  console.log(result);
 });

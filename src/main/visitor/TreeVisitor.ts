@@ -6,5 +6,5 @@ export default abstract class TreeVisitor {
   abstract preVisitInternal(context: VisitContext): VisitResult
   abstract postVisitInternal(context: VisitContext): VisitResult
   abstract visitExternal(context: VisitContext): VisitResult
-  abstract visitFailure(context: VisitContext): VisitResult
+  abstract visitFailure(context: VisitContext, err: any): VisitResult
 }
